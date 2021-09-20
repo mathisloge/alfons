@@ -7,6 +7,9 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 
 set(CMAKE_DEBUG_POSTFIX "d")
 
+option(BUILD_SHARED_LIBS "build shared" ON)
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 # Install alfons
