@@ -134,7 +134,7 @@ protected:
 
     static FT_Error force_ucs2_charmap(FT_Face face);
 
-    std::mutex mtx_;
+    mutable std::mutex mtx_;
 };
 
 }

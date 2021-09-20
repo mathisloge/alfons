@@ -64,6 +64,8 @@ target_link_libraries(alfons PUBLIC
   ${ALFONS_APPLE_LIBRARIES}
 )
 
+set_target_properties(alfons PROPERTIES CXX_STANDARD 11)
+
 ### check for undefined symbols
 if(BUILD_SHARED_LIBS AND CMAKE_COMPILER_IS_GNUCXX)
   target_link_libraries(alfons PRIVATE "-z defs")
