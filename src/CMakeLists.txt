@@ -4,7 +4,7 @@ find_package(harfbuzz CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 
 
-add_library(linebreak STATIC
+add_library(linebreak
   linebreak/linebreak.c
   linebreak/linebreakdata.c
   linebreak/linebreakdef.c
@@ -46,7 +46,7 @@ if (APPLE AND HB_HAVE_CORETEXT)
   add_definitions(-DHAVE_CORETEXT)
 endif()
 
-add_library(alfons STATIC ${ALFONS_SRC})
+add_library(alfons ${ALFONS_SRC})
 
 target_include_directories (alfons PUBLIC
   $<INSTALL_INTERFACE:include>
@@ -71,7 +71,7 @@ if(BUILD_SHARED_LIBS AND CMAKE_COMPILER_IS_GNUCXX)
   target_link_libraries(alfons PRIVATE "-z defs")
 endif()
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+if(MSVC)
   target_compile_options(alfons
     PRIVATE
     -D_USE_MATH_DEFINES
