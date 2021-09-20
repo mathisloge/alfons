@@ -21,6 +21,7 @@
 #include <vector>
 #include <memory>
 #include <tuple>
+#include <mutex>
 
 namespace alfons {
 
@@ -132,6 +133,8 @@ protected:
     std::vector<hb_language_t> m_languages;
 
     static FT_Error force_ucs2_charmap(FT_Face face);
+
+    std::mutex mtx_;
 };
 
 }

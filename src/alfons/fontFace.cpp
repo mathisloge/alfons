@@ -211,7 +211,7 @@ const GlyphData* FontFace::createGlyph(hb_codepoint_t codepoint) const {
         return nullptr;
 
     // FIXME mutex
-
+    std::unique_lock<std::mutex> l{mtx_};
     return m_ft.loadGlyph(m_ftFace, codepoint);
 }
 
