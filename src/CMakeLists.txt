@@ -1,15 +1,19 @@
-if(POLICY CMP0054)
-  cmake_policy(SET CMP0054 NEW)
-endif()
+find_package(ICU REQUIRED COMPONENTS uc)
+find_package(freetype CONFIG REQUIRED)
+find_package(harfbuzz CONFIG REQUIRED)
+find_package(glm CONFIG REQUIRED)
 
-add_library (linebreak
+
+add_library(linebreak STATIC
   linebreak/linebreak.c
   linebreak/linebreakdata.c
-  linebreak/linebreakdef.c)
+  linebreak/linebreakdef.c
+)
 
-target_include_directories (linebreak
-  PUBLIC
-  ${CMAKE_CURRENT_SOURCE_DIR}/linebreak)
+target_include_directories (linebreak PUBLIC
+  $<INSTALL_INTERFACE:include/linebreak>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/linebreak>
+)
 
 set(ALFONS_SRC
   alfons/alfons.cpp
@@ -23,8 +27,8 @@ set(ALFONS_SRC
   alfons/quadMatrix.cpp
   alfons/path/lineSampler.cpp
   alfons/path/splinePath.cpp
-  # TODO part of icu-extras
-  alfons/scrptrun.cpp)
+  alfons/scrptrun.cpp
+)
 
 if (APPLE AND HB_HAVE_CORETEXT)
   list(APPEND ALFONS_SRC alfons/appleFontConverter/fontConverter.mm)
@@ -32,39 +36,37 @@ if (APPLE AND HB_HAVE_CORETEXT)
 
   set(ALFONS_APPLE_LIBRARIES
     "-framework CoreGraphics"
-    "-framework Foundation")
+    "-framework Foundation"
+  )
   if(NOT IOS)
-    set(ALFONS_APPLE_LIBRARIES
-        ${ALFONS_APPLE_LIBRARIES}
-        "-framework AppKit")
+    set(ALFONS_APPLE_LIBRARIES ${ALFONS_APPLE_LIBRARIES} "-framework AppKit")
   endif()
   message(STATUS "ALFONS_APPLE_LIBRARIES: " ${ALFONS_APPLE_LIBRARIES})
 
   add_definitions(-DHAVE_CORETEXT)
 endif()
 
-add_library(alfons ${ALFONS_SRC})
+add_library(alfons STATIC ${ALFONS_SRC})
 
-target_include_directories (alfons
-  PUBLIC
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  ${ALFONS_DEPS_INCLUDE_DIRS}
-  ${GLM_INCLUDE_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}/logger)
+target_include_directories (alfons PUBLIC
+  $<INSTALL_INTERFACE:include>
+  $<INSTALL_INTERFACE:include/logger>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/logger>
+)
 
-target_link_libraries (alfons
-  LINK_PUBLIC
+target_link_libraries(alfons PUBLIC
   linebreak
+  ICU::uc
+  glm::glm
+  freetype
+  harfbuzz::harfbuzz
   ${ALFONS_APPLE_LIBRARIES}
-  ${ALFONS_DEPS_LIBRARIES})
-
-if (USE_OWN_GLM)
-add_dependencies(alfons glm)
-endif()
+)
 
 ### check for undefined symbols
 if(BUILD_SHARED_LIBS AND CMAKE_COMPILER_IS_GNUCXX)
-  target_link_libraries( alfons PRIVATE "-z defs")
+  target_link_libraries(alfons PRIVATE "-z defs")
 endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
@@ -75,4 +77,3 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     -wd4267
     -wd4244)
 endif()
-
